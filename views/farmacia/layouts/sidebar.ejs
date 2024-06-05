@@ -1,0 +1,78 @@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+  <div class="app-brand demo">
+    <a href="/farmacia/dashboard" class="app-brand-link mb-3 pt-2">
+      <span class="app-brand-logo demo">
+        <img src="/img/timeless-favicon.png" alt="">
+      </span>
+      <span class="app-brand-text demo menu-text fw-bolder ms-2"></span>
+    </a>
+
+    <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+      <i class="bx bx-chevron-left bx-sm align-middle"></i>
+    </a>
+  </div>
+
+  <div class="menu-inner-shadow"></div>
+
+  <ul class="menu-inner py-1">
+    <!-- Dashboard -->
+    <li class="menu-item active">
+      <a href="/farmacia/dashboard" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-home-circle"></i>
+        <div data-i18n="Analytics">Painel principal</div>
+      </a>
+    </li>  
+
+    <li class="menu-header small text-uppercase">
+      <span class="menu-header-text">Páginas</span>
+    </li>
+    <li class="menu-item">
+      <a href="/farmacia/produtos" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-collection"></i>
+        <div data-i18n="Basic">Produtos</div>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="/farmacia/farmacias/<%=farmacia._id%>/orders" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-collection"></i>
+        <div data-i18n="Basic">Pedidos</div>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="javascript:void(0)" class="menu-link menu-toggle">
+        <i class="menu-icon tf-icons bx bx-box"></i>
+        <div data-i18n="User interface">Relatótios</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item">
+          <a href="/farmacia/total_vendido" class="menu-link">
+            <div data-i18n="Accordion">Total vendido</div>
+          </a>
+        </li> 
+        <li class="menu-item">
+          <a href="/farmacia/status_pedido" class="menu-link">
+            <div data-i18n="Buttons">Estado de pedidos</div>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="/farmacia/clientes_mais_pedidos" class="menu-link">
+            <div data-i18n="Carousel">Venda por clientes</div>
+          </a>
+        </li>   
+      </ul>
+    </li>    
+    <li class="menu-item">
+      <a href="/farmacia/editar/<%=farmacia._id%>" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-collection"></i>
+        <div data-i18n="Basic">Editar Farmácia</div>
+      </a>
+    </li>
+    <li class="menu-item">
+      <a href="/farmacia/desconto" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-collection"></i>
+        <div data-i18n="Basic">Descontos</div>
+      </a>
+    </li>
+
+  </ul>
+</aside> 

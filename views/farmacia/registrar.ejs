@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <title>Criar Conta</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	  <link rel="stylesheet" href="/assets/css/login.css">
+	</head>
+	<body>
+	<section class="ftco-section">
+		<div class="container">
+			<div class="row justify-content-center"> 
+			</div>
+			<div class="row justify-content-center">
+				<div class="col-md-12 col-lg-10">
+					<div class="wrap d-md-flex">
+						<div class="img" style="background-image: url(/assets/images/slide-01.jpg);">
+			      </div>
+						<div class="login-wrap col-8 p-4 p-md-5">
+			      	<div class="d-flex">
+			      		<div class="w-100 ml-3">
+			      			<h3 class="mb-4">Cadastar Farmácia</h3>
+			      		</div>
+			      	</div>
+					      <%- include('./layouts/msg') %> 
+
+				      <form  action="/farmacia/registrar" method="POST"  enctype="multipart/form-data">
+                <div class="d-flex justify-content-between">
+                  <div class="col-6 mb-3">
+                    <label for="">Nome da farmácia</label>
+                    <input  name="descricao" value="Sem descrição desta farmácia" hidden>
+                    <input type="text" class="form-control" name="name" placeholder="Nome da farmácia" required maxlength="30" minlength="6">
+                  </div>
+  
+                  <div class="col-6 mb-3">
+                    <label for="">Email</label>
+                    <input type="email" class="form-control" name="email" placeholder="Insira um email" required/>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div class="col-6 mb-3">
+                    <label for="">Província</label>
+                    <input  name="descricao" value="Sem descrição desta farmácia" hidden>
+                    <input type="text" class="form-control" name="provincia" placeholder="Insira a provincia" required maxlength="30" minlength="6">
+                  </div>
+  
+                  <div class="col-6 mb-3">
+                    <label for="">Município</label>
+                    <input type="text" class="form-control" name="municipio" placeholder="Insira o municipio" required/>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                  <div class="col-6 mb-3">
+                    <label for="">Endereço</label>
+                    <input  name="descricao" value="Sem descrição desta farmácia" hidden>
+                    <input type="text" class="form-control" name="endereco" placeholder="Insira o endereço" required maxlength="30" minlength="6">
+                  </div>
+  
+                  <div class="col-6 mb-3">
+                    <label for="">Telefone</label>
+                    <input type="number" class="form-control" name="numero" placeholder="Insira o número" required/>
+                  </div>
+                </div> 
+
+                <div class="d-flex justify-content-between">
+                  <div class="col-6 mb-3">
+                    <label for="">Senha</label>
+                    <input type="password" class="form-control" name="password" placeholder="Senha" required  minlength="8"/>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <label for="">Confirmar senha</label>
+                  <input type="password" class="form-control" name="password2" placeholder="Confirmar Senha" required  minlength="8"/>
+                  </div>
+                </div>
+
+                <div class="justify-center text-center">
+                  <input type="submit" id="submitButton" class=" btn btn-success w-25" value="Cadastar"/>
+                </div>
+                
+		            <div class="form-group text-center mt-3 d-md-flex">
+		            	<div class=" w-100 mt-2">
+                     Já tem uma conta? <a class="text-primary" href="/farmacia/login">Fazer Login</a>
+                  </div>  
+		            </div>                
+              </form>
+		          <p class="text-center"><a href="/"><button class="text-primary btn">Ir a página principal</button></a></p>
+		      </div>
+				</div>
+			</div>
+		</div>
+	</section>
+	</body>
+</html> 
+<script src="/js/signUp.js"></script> 
