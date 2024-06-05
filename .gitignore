@@ -1,6 +1,6 @@
 .env
 /node_modules
-
+/public/img
 # Local environment files
 .env.local
 .env.*.local
