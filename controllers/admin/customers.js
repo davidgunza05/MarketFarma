@@ -39,7 +39,7 @@ exports.deleteCustomers = async (req, res) => {
     const deleteUser = await UserCLTN.findByIdAndDelete(userId);
 
     // Deleta todas as compras associadas a esse usuário
-    await Purchase.deleteMany({ userId: userId });
+    await OrderModel.deleteMany({ userId: userId });
 
     req.flash('success_msg', 'Cliente e suas compras deletados com sucesso');
     res.redirect("/admin/customer_management");

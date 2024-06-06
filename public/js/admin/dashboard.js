@@ -18,6 +18,7 @@ $.ajax({
       type: "bar",
       data: {
         labels: [
+          "Mai",
           "Jun",
           "Jul",
           "Ago",
@@ -29,7 +30,6 @@ $.ajax({
           "Fev",
           "Mar",
           "Abr",          
-          "Mai",
         ],
         datasets: [
           {
@@ -104,6 +104,7 @@ $.ajax({
       type: "bar",
       data: {
         labels: [
+          "Mai",
           "Jun",
           "Jul",
           "Ago",
@@ -115,7 +116,6 @@ $.ajax({
           "Fev",
           "Mar",
           "Abr",          
-          "Mai",
         ],
         datasets: [
           {

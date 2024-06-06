@@ -42,6 +42,7 @@
               <% if (error != 0) { %>
                 <div class="flash-message flash-error"><%= error %></div>
               <% } %>
+					    <%- include('./layouts/msg') %> 
               <form action="/farmacia/login" method="post" class="signin-form">
                 <div class="form-group mt-4">
                   <input type="email" class="form-control" name="email" required>

@@ -6,16 +6,17 @@ const ClienteModel = require("../models/user/details")
 const OrderModel = require("../models/user/orders")
 const CategoriaModel = require("../models/admin/category");
 const { Auth } = require('../config/auth');
-const upload = require("../utilities/imageUpload");
+const upload = require("../utilities/imageUpload"); 
 const DesconontoModel = require("../models/admin/coupons");
 const cron = require('node-cron')
 const { default: mongoose } = require("mongoose");
 const sharp = require("sharp");
 const bcrypt = require('bcryptjs');  
 const passport = require('passport');
-const moment = require("moment");
+const moment = require("moment");  
 const PDFDocument = require('pdfkit');
 const fs = require('fs'); 
+const pdf = require('html-pdf');
       
 
 require('../config/passport')(passport);
@@ -52,7 +53,6 @@ router.get('/pefil/:id', async (req, res) => {
   }
 });
 
-
 router.get('/login', (req, res) => {
   res.render('farmacia/login')
 }) 
@@ -61,67 +61,53 @@ router.get('/registrar', (req, res) => {
   res.render('farmacia/registrar')
 })
 
-router.post('/registrar', upload.fields([{ name: "thumbnail", maxCount: 1 }]), (req, res) => {
-  const { name, email, password, password2 } = req.body;
-  let errors = [];
+router.post('/registrar', upload.fields([{ name: "thumbnail", maxCount: 1 }]), async (req, res) => {
+    try{
+      const { email, password, password2} = req.body;
+   
+      if (password != password2) {
+        req.flash('error_msg', 'As senhas não são iguais.');
+        res.redirect('/farmacia/registrar');
+      }else{
+    
+        Farmacia.findOne({ email: email }).then(farmacia => {
+            if (farmacia) {
+              req.flash('error_msg', 'Este email já está registrado.');
+              res.redirect('/farmacia/registrar');
+            } else {
 
-  if (!name || !email || !password || !password2) {
-    errors.push({ msg: 'Please enter all fields' });
-  }
+              let thumbnail = `${req.body.name}_${Date.now()}.WebP`;
+              sharp(req.files.thumbnail[0].buffer).resize(500).toFile(`public/img/users/${thumbnail}`);
+              req.body.thumbnail = thumbnail;
 
-  if (password != password2) {
-    errors.push({ msg: 'Passwords do not match' });
-  }
-
-  if (password.length < 6) {
-    errors.push({ msg: 'Password must be at least 6 characters' });
-  }
-
-  if (errors.length > 0) {
-    return res.render('farmacia/registrar', { errors });
-  }
-
-  if (!req.files || !req.files.thumbnail) {
-    errors.push({ msg: 'Please upload a thumbnail image' });
-    return res.render('farmacia/registrar', { errors });
-  }
-
-  let thumbnail = `${req.body.name}_thumbnail_${Date.now()}.webp`;
-  sharp(req.files.thumbnail[0].buffer)
-    .resize(500)
-    .toFile(`public/img/users/${thumbnail}`)
-    .then(() => {
-      req.body.thumbnail = thumbnail;
-
-      Farmacia.findOne({ email: email }).then(farmacia => {
-        if (farmacia) {
-          errors.push({ msg: 'Email already exists' });
-          return res.render('farmacia/registrar', { errors });
-        }
-
-        const newFarmacia = new Farmacia(req.body);
-
-        bcrypt.genSalt(10, (err, salt) => {
-          if (err) throw err;
-          bcrypt.hash(newFarmacia.password, salt, (err, hash) => {
-            if (err) throw err;
-            newFarmacia.password = hash;
-            newFarmacia.save()
-              .then(farmacia => {
-                req.flash('success_msg', 'You are now registered and can log in');
-                res.redirect('/farmacia/login');
-              })
-              .catch(err => console.log(err));
-          });
-        });
-      });
-    })
-    .catch(err => {
-      console.error('Error processing image:', err);
-      errors.push({ msg: 'Error processing image' });
-      res.render('farmacia/registrar', { errors });
-    });
-});
+              const newFarmacia = new Farmacia(req.body);
+      
+              // Criptografar a senha
+              bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(newFarmacia.password, salt, (err, hash) => {
+                  if (err) throw err;
+                  newFarmacia.password = hash;
+                  newFarmacia.save()
+                    .then(farmacia => {
+                      req.flash('success_msg', 'Farmácia registrada, entre em contacto com o admin para ativar a sua conta.');
+                      res.redirect('/farmacia/login');
+                    })
+                    .catch(err => {
+                      req.flash('error_msg', 'Erro ao registrar a farmácia.');
+                      res.redirect('/farmacia/registrar');
+                      console.log(err)
+                    });
+                });
+              });
+            }
+        })
+        
+      }
+    }
+    catch(err) {
+      console.log('Erro ao cadastrar farmácia', err)
+    }
+  })
 
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', {
@@ -521,6 +507,21 @@ router.get('/orders/delete_order', Auth, async (req, res) => {
   }
 });
 
+router.patch('/orders', Auth, async (req, res) =>{
+  try {
+    await OrderModel.findByIdAndUpdate(req.body.orderID, {
+      $set: {
+        delivered: true,
+        deliveredOn: Date.now(),
+      },
+    });
+    res.json({
+      data: { delivered: 1 },
+    });
+  } catch (error) {
+    console.log("Erro ao entregar o pedidod: " + error);
+  }
+})
 
 //# ROTA DE RELATÓRIOS
 
@@ -710,6 +711,7 @@ router.get('/total_vendido', Auth, async (req, res) => {
       inTransit,
       Cancelado,
       delivered: deliveredOrders,
+      pdfLink: '/farmacia/total_vendido/pdf',
       dailyOrderData,
       farmacia: req.user,
       documentTitle: 'Relatórios de venda',
@@ -962,7 +964,6 @@ router.get('/editar/:id', Auth,  async (req, res) => {
   }
 });
 
-
 //#ROTA PARA POST DE EDITAR FARMÁCIA 
 // Rota para atualizar as informações da farmácia
 router.post('/editar/:id', Auth, upload.fields([{ name: "thumbnail", maxCount: 1 }]), async (req, res) => {
@@ -983,4 +984,401 @@ router.post('/editar/:id', Auth, upload.fields([{ name: "thumbnail", maxCount: 1
 })
 
 
-module.exports = router;  
+//ROTA PARA GERAR PDF DOS RELATÓRISO 
+// Existing route with PDF download option
+ 
+
+
+router.get('/total_fatura_gerar/pdf/vendido', Auth, async (req, res) => {
+  try {
+    const currentYear = new Date().getFullYear();
+
+    const orderData = await OrderModel.aggregate([
+      { $match: { farmacia: req.user._id } },
+      {
+        $project: {
+          totalProducts: "$totalQuantity",
+          billAmount: "$finalPrice",
+          month: { $month: "$orderedOn" },
+          year: { $year: "$orderedOn" },
+        },
+      },
+      {
+        $group: {
+          _id: { month: "$month", year: "$year" },
+          totalProducts: { $sum: "$totalProducts" },
+          totalOrders: { $sum: 1 },
+          revenue: { $sum: "$billAmount" },
+          avgBillPerOrder: { $avg: "$billAmount" },
+        },
+      },
+      { $match: { "_id.year": currentYear } },
+      { $sort: { "_id.month": 1 } },
+    ]);
+
+    const dailyOrderData = await OrderModel.aggregate([
+      { $match: { farmacia: req.user._id } },
+      {
+        $project: {
+          totalProducts: "$totalQuantity",
+          billAmount: "$finalPrice",
+          month: { $month: "$orderedOn" },
+          year: { $year: "$orderedOn" },
+          day: { $dayOfMonth: "$orderedOn" },
+        },
+      },
+      {
+        $group: {
+          _id: { month: "$month", year: "$year", day: "$day" },
+          totalProducts: { $sum: "$totalProducts" },
+          totalOrders: { $sum: 1 },
+          revenue: { $sum: "$billAmount" },
+          avgBillPerOrder: { $avg: "$billAmount" },
+        },
+      },
+      { $match: { "_id.year": currentYear } },
+      { $sort: { "_id.month": 1, "_id.day": 1 } },
+    ]);
+
+    const deliveredOrders = await OrderModel.countDocuments({ farmacia: req.user._id, delivered: true });
+
+    const notDelivered = await OrderModel.aggregate([
+      { $match: { farmacia: req.user._id, delivered: false } },
+      {
+        $group: {
+          _id: "$status",
+          status: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const timestamp = Date.now();
+    const date = new Date(timestamp);
+    const day = date.getDate();
+    const month = date.getMonth(); // Note que getMonth() retorna 0-11
+    const year = date.getFullYear();
+    const months = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+    const monthName = months[month];
+    const formattedDate = `${day.toString().padStart(2, '0')} de ${monthName} de ${year}`;
+
+    const htmlContent = `
+    
+    <!DOCTYPE html>
+<html lang="en, id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+* {
+  margin: 0 auto;
+  padding: 0 auto;
+  user-select: none;
+}
+
+body { 
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased; 
+  font-size: 16px;
+}
+
+.wrapper-invoice {
+  display: flex;
+  justify-content: center;
+}
+.wrapper-invoice .invoice {
+  height: auto;
+  background: #fff;
+  padding: 5vh;
+  margin-top: 6vh; 
+  padding: 6rem; 
+  width: 100%;
+  box-sizing: border-box; 
+}
+.wrapper-invoice .invoice .invoice-information {
+  float: right;
+  text-align: right;
+}
+.wrapper-invoice .invoice .invoice-information b {
+  color: "#0F172A";
+}
+.wrapper-invoice .invoice .invoice-information p {
+  font-size: 16px;
+  color: gray;
+}
+.wrapper-invoice .invoice .invoice-logo-brand h2 {
+  text-transform: uppercase;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-size: 2.9vh;
+  color: "#0F172A";
+}
+.wrapper-invoice .invoice .invoice-logo-brand img {
+  max-width: 100px;
+  width: 100%;
+  object-fit: fill;
+}
+.wrapper-invoice .invoice .invoice-head {
+  display: flex;
+  margin-top: 8vh;
+}
+.wrapper-invoice .invoice .invoice-head .head {
+  width: 100%;
+  box-sizing: border-box;
+}
+.wrapper-invoice .invoice .invoice-head .client-info {
+  text-align: left;
+}
+.wrapper-invoice .invoice .invoice-head .client-info h2 {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  font-size: 16px;
+  color: "#0F172A";
+}
+.wrapper-invoice .invoice .invoice-head .client-info p {
+  font-size: 16px;
+  color: gray;
+}
+.wrapper-invoice .invoice .invoice-head .client-data {
+  text-align: right;
+}
+.wrapper-invoice .invoice .invoice-head .client-data h2 {
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  font-size: 16px;
+  color: "#0F172A";
+}
+.wrapper-invoice .invoice .invoice-head .client-data p {
+  font-size: 16px;
+  color: gray;
+}
+.wrapper-invoice .invoice .invoice-body {
+  margin-top: 8vh;
+}
+.wrapper-invoice .invoice .invoice-body .table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.wrapper-invoice .invoice .invoice-body .table thead tr th {
+  font-size: 16px;
+  border: 1px solid #dcdcdc;
+  text-align: left;
+  padding: 1vh;
+  background-color: #eeeeee;
+}
+.wrapper-invoice .invoice .invoice-body .table tbody tr td {
+  font-size: 16px;
+  border: 1px solid #dcdcdc;
+  text-align: left;
+  padding: 1vh;
+  background-color: #fff;
+}
+.wrapper-invoice .invoice .invoice-body .table tbody tr td:nth-child(2) {
+  text-align: right;
+}
+.wrapper-invoice .invoice .invoice-body .flex-table {
+  display: flex;
+}
+.wrapper-invoice .invoice .invoice-body .flex-table .flex-column {
+  width: 100%;
+  box-sizing: border-box;
+}
+.wrapper-invoice .invoice .invoice-body .flex-table .flex-column .table-subtotal {
+  border-collapse: collapse;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 16px;
+}
+.wrapper-invoice .invoice .invoice-body .flex-table .flex-column .table-subtotal tbody tr td {
+  font-size: 16px;
+  border-bottom: 1px solid #dcdcdc;
+  text-align: left;
+  padding: 1vh;
+  background-color: #fff;
+}
+.wrapper-invoice .invoice .invoice-body .flex-table .flex-column .table-subtotal tbody tr td:nth-child(2) {
+  text-align: right;
+}
+.wrapper-invoice .invoice .invoice-body .invoice-total-amount {
+  margin-top: 1rem;
+}
+.wrapper-invoice .invoice .invoice-body .invoice-total-amount p {
+  font-weight: bold;
+  color: "#0F172A";
+  text-align: right;
+  font-size: 16px;
+}
+.wrapper-invoice .invoice .invoice-footer {
+  margin-top: 4vh;
+}
+.wrapper-invoice .invoice .invoice-footer p {
+  font-size: 1.7vh;
+  color: gray;
+}
+
+.copyright {
+  margin-top: 2rem;
+  text-align: center;
+}
+.copyright p {
+  color: gray;
+  font-size: 1.8vh;
+}
+
+@media print {
+  .table thead tr th {
+    -webkit-print-color-adjust: exact;
+    background-color: #eeeeee !important;
+  }
+
+  .copyright {
+    display: none;
+  }
+}
+.rtl {
+  direction: rtl;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+.rtl .invoice-information {
+  float: left !important;
+  text-align: left !important;
+}
+.rtl .invoice-head .client-info {
+  text-align: right !important;
+}
+.rtl .invoice-head .client-data {
+  text-align: left !important;
+}
+.rtl .invoice-body .table thead tr th {
+  text-align: right !important;
+}
+.rtl .invoice-body .table tbody tr td {
+  text-align: right !important;
+}
+.rtl .invoice-body .table tbody tr td:nth-child(2) {
+  text-align: left !important;
+}
+.rtl .invoice-body .flex-table .flex-column .table-subtotal tbody tr td {
+  text-align: right !important;
+}
+.rtl .invoice-body .flex-table .flex-column .table-subtotal tbody tr td:nth-child(2) {
+  text-align: left !important;
+}
+.rtl .invoice-body .invoice-total-amount p {
+  text-align: left !important;
+}
+td{
+  text-center;
+  justify-content-center
+}
+ 
+</style>
+  </head>
+  <body>
+    <section class="wrapper-invoice">
+      <!-- switch mode rtl by adding class rtl on invoice class -->
+      <div class="invoice">
+        <div class="invoice-information">  
+        <p><b>Data: </b> ${formattedDate}</p>
+        </div>
+        <!-- logo brand invoice -->
+        <div class="invoice-logo-brand">
+          <!-- <h2>Tampsh.</h2> -->
+          <img src="logo_dark.png" alt="" />
+        </div>
+        <!-- invoice head -->
+        <div class="invoice-head">
+          <div class="head client-info">
+            <p>Projeto da PAP.</p>uyuu n
+            <p>Gerado por: <strong>${req.user.name}</strong></p> 
+          </div> 
+        </div>
+ 
+        <!-- invoice body-->
+        <div class="invoice-body">
+            <h3>1. Venda por mês</h3>
+            <br>
+          <table class="table">
+            <thead>
+              <tr> 
+                <th>Mês</th>
+                <th>Produtos vendidos</th>
+                <th>Total de pedidos</th>
+                <th>Receita</th>
+                <th>Gasto médio por pedido</th> 
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${orderData[0]._id.month}/${orderData[0]._id.year}</td>
+                <td>${orderData[0].totalProducts}</td>
+                <td>${orderData[0].totalOrders}</td>
+                <td>${orderData[0].revenue}</td>
+                <td>${orderData[0].avgBillPerOrder}</td> 
+              </tr> 
+            </tbody>
+          </table>
+        </div>
+
+        <div class="invoice-body">
+            <h3>1. Venda por dia</h3>
+            <br>
+          <table class="table">
+            <thead>
+              <tr> 
+                <th>Data</th>
+                <th>Produtos vendidos</th>
+                <th>Total de pedidos</th>
+                <th>Receita</th>
+                <th>Gasto médio por pedido</th> 
+              </tr>
+            </thead>
+            <tbody>
+                ${dailyOrderData.map(dailyOrder => `
+                    <tr> 
+                        <td>${dailyOrder.totalOrders}</td>
+                        <td>${dailyOrder.totalProducts}</td>
+                        <td>${dailyOrder.revenue} Kz</td>
+                        <td>${dailyOrder.avgBillPerOrder} Kz</td>
+                    </tr>   
+                `).join('')}
+            </tbody>
+          </table>
+        </div> 
+      </div>
+    </section> 
+  </body>
+</html>
+    `;
+
+    const options = { format: 'Letter' };
+
+    pdf.create(htmlContent, options).toFile('./example.pdf', (err, resFile) => {
+      if (err) {
+        console.error('Erro ao criar o PDF:', err);
+        return res.status(500).send('Erro ao processar a solicitação');
+      }
+      
+      res.setHeader('Content-Disposition', 'attachment; filename="fatura.pdf"');
+      res.setHeader('Content-Type', 'application/pdf');
+
+      const filestream = fs.createReadStream('./example.pdf');
+      filestream.pipe(res);
+
+      filestream.on('close', () => {
+        fs.unlink('./example.pdf', (err) => {
+          if (err) {
+            console.error('Erro ao excluir o arquivo PDF:', err);
+          }
+        });
+      });
+    });
+  } catch (error) {
+    console.error("Erro ao criar dados do PDF:", error);
+    res.status(500).send('Erro no servidor');
+  }
+});
+
+
+
+
+module.exports = router;   

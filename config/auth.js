@@ -4,8 +4,8 @@ module.exports = {
         return next();
       }
       
-      req.flash('error_msg', 'Please log in to view that resource');
+      req.flash('error_msg', 'Por favor faz login para acessar');
       res.redirect('/farmacia/login');
-    }
+    }  
   };
   

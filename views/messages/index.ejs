@@ -1,0 +1,19 @@
+<%- include('partials/header') %>
+<div class="chat-container">
+  <h2>Chat entre <%= user.name %> e <%= contact.name %></h2>
+  <div class="messages">
+    <% messages.forEach(message => { %>
+      <div class="message <%= message.sender.toString() === user._id.toString() ? 'sent' : 'received' %>">
+        <p><%= message.content %></p>
+        <small><%= message.createdAt.toLocaleString() %></small>
+      </div>
+    <% }) %>
+  </div>
+  <form action="/message/send" method="POST">
+    <input type="hidden" name="senderId" value="<%= user._id %>">
+    <input type="hidden" name="receiverId" value="<%= contact._id %>">
+    <textarea name="content" rows="3" required></textarea>
+    <button type="submit">Enviar</button>
+  </form> 
+</div>
+<%- include('partials/footer') %>

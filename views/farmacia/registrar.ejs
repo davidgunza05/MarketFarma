@@ -27,9 +27,9 @@
 				      <form  action="/farmacia/registrar" method="POST"  enctype="multipart/form-data">
                 <div class="d-flex justify-content-between">
                   <div class="col-6 mb-3">
-                    <label for="">Nome da farmácia</label>
                     <input  name="descricao" value="Sem descrição desta farmácia" hidden>
-                    <input type="text" class="form-control" name="name" placeholder="Nome da farmácia" required maxlength="30" minlength="6">
+                    <label for="">Nome da farmácia</label>
+                    <input type="text" class="form-control" name="name" placeholder="Nome da farmácia" required>
                   </div>
   
                   <div class="col-6 mb-3">
@@ -41,8 +41,7 @@
                 <div class="d-flex justify-content-between">
                   <div class="col-6 mb-3">
                     <label for="">Província</label>
-                    <input  name="descricao" value="Sem descrição desta farmácia" hidden>
-                    <input type="text" class="form-control" name="provincia" placeholder="Insira a provincia" required maxlength="30" minlength="6">
+                    <input type="text" class="form-control" name="provincia" placeholder="Insira a provincia" required>
                   </div>
   
                   <div class="col-6 mb-3">
@@ -54,8 +53,7 @@
                 <div class="d-flex justify-content-between">
                   <div class="col-6 mb-3">
                     <label for="">Endereço</label>
-                    <input  name="descricao" value="Sem descrição desta farmácia" hidden>
-                    <input type="text" class="form-control" name="endereco" placeholder="Insira o endereço" required maxlength="30" minlength="6">
+                    <input type="text" class="form-control" name="endereco" placeholder="Insira o endereço" required>
                   </div>
   
                   <div class="col-6 mb-3">
@@ -67,12 +65,16 @@
                 <div class="d-flex justify-content-between">
                   <div class="col-6 mb-3">
                     <label for="">Senha</label>
-                    <input type="password" class="form-control" name="password" placeholder="Senha" required  minlength="8"/>
+                    <input type="password" class="form-control" name="password" placeholder="Senha" required/>
                   </div>
                   <div class="col-6 mb-3">
                     <label for="">Confirmar senha</label>
-                  <input type="password" class="form-control" name="password2" placeholder="Confirmar Senha" required  minlength="8"/>
+                  <input type="password" class="form-control" name="password2" placeholder="Confirmar Senha" required/>
                   </div>
+                </div>
+                <div class="form-group mb-3">
+                  <label for="thumbnail">Imagem Principal</label>
+                  <input type="file" class="form-control" id="thumbnail" name="thumbnail" required>
                 </div>
 
                 <div class="justify-center text-center">

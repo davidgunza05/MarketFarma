@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 150px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #007BFF;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table, .table th, .table td {
+            border: 1px solid #ccc;
+        }
+        .table th, .table td {
+            padding: 10px;
+            text-align: center;
+        }
+        .table th {
+            background-color: #007BFF;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="<%= /img/users/<%=farmacia.thumbnail%> %>" alt="Logo">
+        <h1>Relatório de Vendas - <%= farmacia.name %></h1>
+        <p><%= farmacia.endereco %>, <%= farmacia.municipio %>, <%= farmacia.provincia %></p>
+        <p>Email: <%= farmacia.email %> | Telefone: <%= farmacia.numero %></p>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mês</th>
+                <th>Total de Produtos</th>
+                <th>Total de Pedidos</th>
+                <th>Receita</th>
+                <th>Média por Pedido</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% orderData.forEach(order => { %>
+                <tr>
+                    <td><%= order._id.month %></td>
+                    <td><%= order.totalProducts %></td>
+                    <td><%= order.totalOrders %></td>
+                    <td><%= order.revenue %></td>
+                    <td><%= order.avgBillPerOrder.toFixed(2) %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</body>
+</html>
