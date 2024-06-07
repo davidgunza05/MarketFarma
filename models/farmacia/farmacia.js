@@ -42,6 +42,12 @@ const FarmaciaSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: false
+  },
+  latitude: {
+    type: Number,  // Adiciona latitude 
+  },
+  longitude: {
+    type: Number,  // Adiciona longitude 
   }
 });
 

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Localização da Farmácia</title>
+  <style>
+    /* Estilo para o mapa */
+    #map {
+      height: 520px; /* Altura do mapa */
+      width: 100%; /* Largura do mapa */
+    }
+
+    /* Estilo para a mensagem de erro */
+    #error-message {
+      color: red;
+      font-size: 1.2em;
+      margin-top: 20px;
+    }
+  </style>
+  <!-- Inclusão do Google Maps JavaScript API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDjk8H9I1ioufahWfLentyHeSN-bYcv4oY" async defer></script>
+</head>
+<%- include('./layouts/styles') %>
+<body>
+  <div class="layout-wrapper layout-content-navbar">
+    <div class="layout-container">
+      <%- include('./layouts/sidebar') %>
+      <div class="layout-page">
+        <div class="content-wrapper">
+          <!-- Content -->
+          <div class="container-xxl flex-grow-1 container-p-y">
+            <%- include('./layouts/msg') %>
+            <h1><%= farmacia.name %></h1>
+            <!-- Div para o mapa -->
+            <div id="error-message"></div>
+            <div id="map"></div>
+            <!-- Div para mensagens de erro -->
+            <script>
+              function initMap() {
+                // Verifica se as coordenadas são válidas e numéricas
+                var lat = parseFloat('<%= farmacia.latitude %>');
+                var lng = parseFloat('<%= farmacia.longitude %>');
+
+                // Se as coordenadas não forem válidas, mostra uma mensagem de erro
+                if (isNaN(lat) || isNaN(lng)) {
+                  var errorMessageDiv = document.getElementById('error-message');
+                  errorMessageDiv.innerHTML = 'Inválidas ou sem coordenadas para a farmácia: <%= farmacia.name %>.';
+                  console.error('Coordenadas inválidas para a farmácia:', '<%= farmacia.name %>');
+                  return;
+                }
+
+                var farmaciaLocation = { lat: lat, lng: lng };
+                var map = new google.maps.Map(document.getElementById('map'), {
+                  zoom: 15, // Nível de zoom
+                  center: farmaciaLocation // Centro do mapa
+                });
+                var icon = {
+                  url: 'https://img.icons8.com/?size=100&id=91OmOiLHT1BR&format=png&color=000000', // URL do ícone de farmácia
+                  scaledSize: new google.maps.Size(30, 30), // Tamanho do ícone
+                };
+                var marker = new google.maps.Marker({
+                  position: farmaciaLocation,
+                  map: map,
+                  icon: icon, // Ícone personalizado
+                  title: '<%= farmacia.name %>' // Nome da farmácia como título do marcador
+                });
+                var infowindow = new google.maps.InfoWindow({
+                  content: '<h2><%= farmacia.name %></h2><p><%= farmacia.endereco %>, <%= farmacia.municipio %>, <%= farmacia.provincia %></p>'
+                });
+                marker.addListener('click', function() {
+                  infowindow.open(map, marker);
+                });
+              }
+              // Inicializa o mapa quando a janela é carregada
+              window.onload = initMap;
+            </script>
+          </div>
+        </div>
+        <div class="content-backdrop fade"></div>
+      </div>
+    </div>
+  </div>
+  <div class="layout-overlay layout-menu-toggle"></div>
+  </div>
+  <script src="/js/admin/admin.js"></script>
+  <%- include('./layouts/script') %>
+</body>
+</html>

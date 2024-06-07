@@ -2,7 +2,7 @@
     <!-- Header desktop -->
     <div class="container-menu-desktop trans-03">
         <div class="wrap-menu-desktop">
-            <nav class="limiter-menu-desktop" style="padding-left: 10rem;">
+            <nav class="limiter-menu-desktop" style="padding-left: 7rem;">
                 
                 <!-- Logo desktop -->		
                 <a href="/" class="logo">
@@ -21,7 +21,12 @@
                         </li>
 
                         <li>
-                            <a href="/blog">Blog</a>
+                            <a href="#">Farmácia</a>
+                            <ul class="sub-menu">
+                                <li><a href="/farmacia">Ver Farmácias</a></li>
+                                <li><a href="/farmacia/login">Login</a></li>
+                                <li><a href="/farmacia/registrar">Criar Conta</a></li>
+                            </ul>
                         </li>
 
                         <% if(details !=null) { %>
@@ -36,7 +41,7 @@
                         <% } %>
  
                         <li>
-                            <a href="/sobre">Sobre</a>
+                            <a href="/farmacia/ver/mapa/">Geolocalização</a>
                         </li>
 
                     </ul>
@@ -118,6 +123,15 @@
             <li>
                 <a href="/products">Todos Produtos</a>
             </li>
+
+            <li>
+                <a href="#">Farmácia</a>
+                <ul class="sub-menu">
+                    <li><a href="/farmacia">Ver Farmácias</a></li>
+                    <li><a href="/farmacia/login">Login</a></li>
+                    <li><a href="/farmacia/registrar">Criar Conta</a></li>
+                </ul>
+            </li>
              
             <% if(details !=null) { %>
             <li>
@@ -131,14 +145,10 @@
                     <i class="fa fa-angle-right" aria-hidden="true"></i>
                 </span>
             </li>
-            <% } %>
- 
-            <li>
-                <a href="/blog">Blog</a>
-            </li>
+            <% } %> 
 
             <li>
-                <a href="/sobre">Sobre</a>
+                <a href="/farmacia/ver/mapa/">Geolocalização</a>
             </li>
 
         </ul>

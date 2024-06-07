@@ -28,15 +28,34 @@ moment.locale('pt-br');
 
 router
   .route("/total_fatura_gerar/pdf/vendido")
-  .get(download.Total)
+  .get(Auth, download.Total)
 
 router
   .route("/status_pedido/pdf/download")
-  .get(download.Status)
+  .get(Auth, download.Status)
 
 router
   .route("/cliente_fatura/pdf/download")
-  .get(download.Cliente)
+  .get(Auth, download.Cliente)
+
+router.get('/mapa/:id', async (req, res) => {
+  try {
+    const mapa = await Farmacia.findById(req.params.id);
+    res.render('farmacia/mapa', { mapa, farmacia: req.user });
+  } catch (err) {
+    res.status(500).send('Erro ao carregar a farmácia');
+  }
+});
+
+router.get('/ver/mapa/', async (req, res) => {
+  try { 
+    const categories = await CategoriaModel.find({});
+    const farmacias = await Farmacia.find({ isActive: true });
+    res.render('index/mapa', { farmacias, details: categories}); 
+  } catch (err) {
+    res.status(500).send('Erro ao carregar farmácias: ' + err.message);
+  }
+});
 
   
 //# ROTAS DE AUTENTICAÇÃO

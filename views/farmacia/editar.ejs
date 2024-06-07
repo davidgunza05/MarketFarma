@@ -52,7 +52,9 @@
                       <div class="form-group pb-3">
                         <label for="descricao">Descrição</label>
                         <textarea class="form-control text-justify" id="descricao" name="descricao" cols="30" rows="10" required placeholder="Sobre o produto ou contraindicação"><%= farmacia.descricao %></textarea>
-                      </div>      
+                      </div>  , 
+                      <input type="number" value="<%= farmacia.latitude %>" name="latitude" placeholder="Latitude">    
+                      <input type="number" value="<%= farmacia.longitude %>" name="longitude" placeholder="longitude">    
                       <div class="justify-content-center pt-3 text-center">
                         <button type="submit" class="btn btn-dark me-2">Salvar</button>
                         </a>

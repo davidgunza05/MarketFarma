@@ -16,8 +16,6 @@ const Farmacia = require("../models/farmacia/farmacia");
 const ProdutoModel = require("../models/admin/product")
 
 
-
-
 // Landing Page
 router.get("/", landingPage.viewAll);
 

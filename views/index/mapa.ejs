@@ -1,0 +1,94 @@
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa das Farmácias</title>
+  <style> 
+    #map {
+      height: 600px; /* Altura do mapa */
+      width: 100%; /* Largura do mapa */
+      border-radius: 3px;
+    }
+    .pt-5555{
+        padding-top: 40rem;
+    }
+  </style> 
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDjk8H9I1ioufahWfLentyHeSN-bYcv4oY" 
+          async 
+          defer></script>
+</head>
+<%- include('./partials/links')%>
+<body class="animsition">
+
+<%- include('./partials/header')%>   
+  <section class="bg0 p-b-140 pt-4 mt-2" id="farmaciasContainer">   
+      <div class="row isotope-grid"> 
+        <div class="container">
+            <div id="map"></div> 
+        </div>
+    </div>
+ 
+  </div>
+</section> 
+
+  <script>
+    // Função para inicializar o mapa
+    function initMap() {
+      console.log('Iniciando o mapa...');
+      // Criação do mapa centrado em um local padrão
+      var centerLocation = { lat: -8.81607788506329, lng: 13.263235579572797 }; // Coordenadas centrais para inicializar o mapa
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 13, // Nível de zoom inicial
+        center: centerLocation // Centro do mapa
+      });
+
+      // Array de farmácias passado pelo EJS
+      var farmacias = <%- JSON.stringify(farmacias) %>;
+
+      console.log('Farmácias:', farmacias);
+
+      // Loop para adicionar cada farmácia como um marcador no mapa
+      farmacias.forEach(function(farmacia) {
+        if (farmacia.latitude && farmacia.longitude) { // Verifique se há coordenadas válidas
+          console.log('Adicionando marcador para:', farmacia.name);
+          var marker = new google.maps.Marker({
+            position: { lat: farmacia.latitude, lng: farmacia.longitude },
+            map: map,
+            title: farmacia.name,
+            icon: {
+              url: 'https://img.icons8.com/?size=100&id=91OmOiLHT1BR&format=png&color=000000', // URL do ícone de farmácia
+              scaledSize: new google.maps.Size(30, 30), // Tamanho do ícone
+            }
+          });
+
+          // Criação do infowindow para cada farmácia
+          var infowindow = new google.maps.InfoWindow({
+            content: `<h4>${farmacia.name}</h4><p>${farmacia.endereco}, ${farmacia.municipio}, ${farmacia.provincia}</p>`
+          });
+
+          // Adiciona evento de clique ao marcador para abrir o infowindow
+          marker.addListener('click', function() {
+            infowindow.open(map, marker);
+          });
+        } else {
+          console.log('Farmácia sem coordenadas válidas:', farmacia.name);
+        }
+      });
+    }
+
+    // Espera até que a página esteja completamente carregada antes de inicializar o mapa
+    window.onload = function() {
+      initMap();
+    };
+  </script> 
+
+<div class="pt-5555">
+    <%- include('./partials/footer')%>
+</div>
+<script src="/js/farmaciasListing.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html> 
+
+
