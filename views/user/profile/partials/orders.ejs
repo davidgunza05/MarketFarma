@@ -1,4 +1,4 @@
-<%- include('../layouts/links') %>
+﻿<%- include('../layouts/links') %>
 <body>
   <%- include('../layouts/header') %> 
   <div class="container pt-3">
@@ -54,7 +54,7 @@
           <td><%=order.totalQuantity%></td>
           <td><%=order.modeOfPayment%></td>
           <td><%=order.finalPrice%> Kz</td>
-          <td><%=order.shippingAddress.bairro%> - <%=order.shippingAddress.pincode%>
+          <td><%=order.shippingAddress.municipio%>/<%=order.shippingAddress.bairro%> - <%=order.shippingAddress.pincode%>
           <td><%=moment(order.orderedOn).format('LL')%></td>
           <td><a href="/users/orders/<%=order._id%>" class="btn btn-secondary text-white mt-1" style="font-size: 0.8rem" >Ver detalhe</a></td>
           <script>

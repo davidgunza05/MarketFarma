@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+﻿const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
@@ -52,6 +52,10 @@ const userSchema = new mongoose.Schema(
         ref: "Orders",
       },
     ],
+    username: {
+	type: Boolean,
+        default: true,
+    },	
     couponsUsed: [
       {
         type: mongoose.Types.ObjectId,

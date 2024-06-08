@@ -1,4 +1,4 @@
-    const { default: mongoose, mongo, Mongoose } = require("mongoose");
+﻿    const { default: mongoose, mongo, Mongoose } = require("mongoose");
     const cartCLTN = require("../../models/user/cart");
     const userCLTN = require("../../models/user/details");
     const couponCLTN = require("../../models/admin/coupons");
@@ -6,7 +6,9 @@
     const paypal = require("paypal-rest-sdk");
     const productCLTN =  require('../../models/admin/product')
     const Farmacia =  require('../../models/farmacia/farmacia')
+    const Categoria = require("../../models/admin/category");
     
+
     // Paypal Configuration
     paypal.configure({
       mode: "sandbox", //sandbox or live
@@ -17,7 +19,7 @@
     exports.view = async (req, res) => {
       try {
         const currentUser = await userCLTN.findById(req.session.userID);
-    
+        const details = await Categoria.find({});
         // Products in cart
         const userCart = await cartCLTN
           .findOne({
@@ -60,6 +62,7 @@
             defaultAddress,
             products,
             userCart,
+      	    details,
             allAddresses,
             documentTitle: "Checkout | TIMELESS",
           });
@@ -258,11 +261,11 @@
           customer: req.session.userID,
           farmacia: farmaciaId, // Add the pharmacy ID to the order
           shippingAddress: {
-            building: shippingAddress.building,
-            address: shippingAddress.address,
-            pincode: shippingAddress.pincode,
-            country: shippingAddress.country,
-            contactNumber: shippingAddress.contactNumber,
+            provincia: shippingAddress.provincia,
+            bairro: shippingAddress.bairro,
+            municipio: shippingAddress.municipio,
+            contacto: shippingAddress.contacto, 
+            pincode: shippingAddress.pincode, 
           },
           modeOfPayment: req.body.paymentMethod,
           couponUsed: couponUsed,
@@ -334,6 +337,7 @@
     
     exports.result = async (req, res) => {
       try {
+        const details = await Categoria.find({});
         if (req.session.transactionID) {
           const couponUsed = req.session.couponUsed;
           req.session.transactionID = false;
@@ -374,6 +378,7 @@
           res.render("user/profile/partials/orderResult", {
             documentTitle: orderResult,
             orderID: orderDetails._id,
+            details,
           });
         } else {
           res.redirect("/users/cart/checkout/");
