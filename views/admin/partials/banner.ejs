@@ -84,30 +84,26 @@
       <div class="modal-content" style="background: #fff;">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">
-                Adicionar Banner
+                Adicionar Oferta
           </h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body"> 
                 <form action="" method="post" enctype="multipart/form-data">
+                  <input type="text" name="url" hidden/>
+                  <input type="text" name="videoURL" hidden/>
                   <div class="mb-3">
                     <input type="text" class="form-control" id="form-holder" placeholder="Título" name="title" required/>
                   </div>
                   <div class="mb-3">
-                    <input  type="file" class="form-control" id="form-holder" name="bannerImage"/>
+                    <input  type="file" class="form-control" id="form-holder" accept=".png, .jpg, .img, .WebP" name="bannerImage"/>
                   </div>
                   <div class="mb-3">
                     <input type="text" class="form-control" id="form-holder" placeholder="Descrição" name="description"/>
                   </div>
-                  <div class="mb-3">
-                    <input type="text" class="form-control" id="form-holder" placeholder="URL" name="url"/>
-                  </div>
-                  <div class="mb-3">
-                    <input type="text" class="form-control" id="form-holder" placeholder="URL do vídeo" name="videoURL"/>
-                  </div>
-                  <div class="modal-footer">
+                    <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Criar Banner</button>
+                    <button type="submit" class="btn btn-success">Criar Oferta</button>
                   </div>
                 </form>
         </div>

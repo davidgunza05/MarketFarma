@@ -43,8 +43,9 @@
                           <td>
                             <%=item._id.toString('hex').slice(0, 10)%><br />
                             <a href="/farmacia/order/detalhe/<%= item._id %>" class="btn btn-sm btn-dark text-white m-1">Ver detalhes</a>
+                            <!--
                             <a href="/farmacia/orders/delete_order?id=<%= item._id%>" onclick="return confirm('Pretende eliminar <%= item.name %> ?')" class="btn btn-danger text-white btn-sm "><i class="bx bxs-trash" title="Eliminar"></i></a>
-
+                            -->
                           </td> 
                           <td><%= item.customer.name %><br /><%= item.customer.email %></td>
                           <td style="width: 20%">

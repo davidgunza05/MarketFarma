@@ -5,7 +5,14 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
     },
+    number: {
+      type: Number,
+    },
     email: {
+      type: String,
+      unique: true,
+    },
+    username: {
       type: String,
       unique: true,
     },
@@ -52,10 +59,6 @@ const userSchema = new mongoose.Schema(
         ref: "Orders",
       },
     ],
-    username: {
-	type: Boolean,
-        default: true,
-    },	
     couponsUsed: [
       {
         type: mongoose.Types.ObjectId,
