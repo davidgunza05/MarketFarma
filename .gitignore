@@ -4,6 +4,8 @@
 # Local environment files
 .env.local
 .env.*.local
+Efarma_relatório.docx
+Express-Farma.pptx
 
 # Log files
 npm-debug.log*
