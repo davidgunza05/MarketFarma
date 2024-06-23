@@ -7,7 +7,18 @@
         <%- include('../layouts/nav') %>
         <div class="content-wrapper"> 
           <div class="container-xxl flex-grow-1 container-p-y">
-           
+            <% if(Notificar.length>0){%>
+              <div class="bs-toast toast show toast-placewment-ex m-2 bg-primary" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header pb-4"> 
+                  <div class="me-auto fw-semibold">
+                    <a href="#"  data-bs-toggle="modal" data-bs-target="#exampleModal2" style="text-decoration: underline; color: #fff;">
+                      Tem farmácia nova cadastrada
+                    </a>
+                  </div> 
+                </div>
+              </div>    
+            <%}%>
+
           <div class="row">
             <div class="col-lg-7 mb-4 order-0">
               <div class="card">
@@ -94,9 +105,33 @@
   </div> 
 
 
+  <div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+      <div class="modal-content" style="background: #fff;">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">
+              Novas Farmácias cadastradas
+          </h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body"> 
+          <ul>
+          <% Notificar.forEach(item => { %>
+            <li><%=item.type%></li>
+            <%=item.message%>
+            <form action="/admin/farmacia/read/<%=item._id%>" method="post">
+               <button type="submit" class="btn btn-sm btn-primary">Marcar como lida</button>
+            </form>
+            <br>
+          <%})%> 
+          </ul>
+        </div> 
+    </div>
+    </div>
+  </div>
+
  
   <%- include('../layouts/script') %>
 
-  <script src="/js/admin/dashboard.js"></script> 
 </body>
 </html> 

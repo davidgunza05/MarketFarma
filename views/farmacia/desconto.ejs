@@ -87,8 +87,8 @@
           </h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body"> 
-          <form action="" method="post">
+        <div class="modal-body">  
+          <form action="/farmacia/post/desconto/<%=farmacia._id%>" method="post">
             <div class="mb-3">
               <input value="<%=farmacia._id%>" name="farmacia" hidden>
               <input type="text" class="form-control" id="form-holder" name="name" placeholder="Nome" required/>

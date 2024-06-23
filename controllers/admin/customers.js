@@ -1,7 +1,7 @@
 const { findById, findByIdAndUpdate } = require("../../models/admin/details");
 const UserCLTN = require("../../models/user/details");
 const OrderModel = require("../../models/user/orders");
-const contactoCLTN = require("../../models/farmacia/contacto");
+const contactoCLTN = require("../../models/farmacia/contactoAdmin");
 
 exports.viewAll = async (req, res) => {
   try {

@@ -1,0 +1,48 @@
+<%- include('./layouts/styles') %>
+<body>  
+<div class="layout-wrapper layout-content-navbar">
+  <div class="layout-container">
+    <%- include('./layouts/sidebar') %>
+    <div class="layout-page"> 
+      <div class="content-wrapper">
+        <!-- Content -->
+        <%- include('./layouts/navbar') %>
+        <div class="container-xxl flex-grow-1 container-p-y"> 
+        <%- include('./layouts/msg') %>
+
+          <div class="row">
+            <div class="col-12 grid-margin">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title pb-2">Contactar Admin</h4>
+                  <form action="/farmacia/contactar/admin" method="post"> 
+                    <input name="name" value="<%=farmacia.name%>" hidden>
+                    <input name="email" value="<%=farmacia.email%>" hidden>  
+                    <input name="numero" value="<%=farmacia.numero%>" hidden>  
+                    <div class="form-group mb-3">
+                      <label for="">Descrição</label>
+                      <textarea class="form-control" id="descricao" name="msg" cols="30" rows="10" required placeholder="Sobre o produto ou contraindicação"></textarea>
+                    </div>   
+                    <input type="submit" value="Enviar" class="btn btn-sm btn-dark">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div> 
+        
+        </div> 
+        
+        <div class="content-backdrop fade"></div>
+      </div>
+      <!-- Content wrapper -->
+    </div>
+    <!-- / Layout page -->
+  </div>
+        
+  <!-- Overlay -->
+  <div class="layout-overlay layout-menu-toggle"></div>
+</div> 
+<script src="/js/admin/dashboard.js"></script> 
+<%- include('./layouts/script') %>
+</body>
+</html> 

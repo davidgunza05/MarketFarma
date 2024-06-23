@@ -14,13 +14,22 @@ const orders = require("../controllers/admin/orders");
 const banner = require("../controllers/admin/banner");
 const salesReport = require("../utilities/salesReport");
 const signOut = require("../controllers/admin/signOut");
-const contactCLTN = require('../models/farmacia/contacto') 
+const contactCLTN = require('../models/farmacia/contactoAdmin') 
+const Notification = require('../models/farmacia/notification')
 const orderCLTN = require("../models/user/orders");
 const ProdutoCLTN = require("../models/admin/product");
 const Farmacia = require("../models/farmacia/farmacia");
 const moment = require('moment');
 moment.locale('pt-br');
 
+router.post('/farmacia/read/:id', async (req, res) => {
+  await  Notification.findByIdAndUpdate(req.params.id, {isRead: true}).then(() =>{
+    req.flash('success_msg', 'Notificação marcada como lida')
+    res.redirect("/admin/dashboard");
+  }).catch((err) => {
+    console.log('Erro ao atualizar a nootificação: ', err)
+  }) 
+})
 
 router.get('/farmacias', sessionCheck, async (req, res) => {
   const farmacias = await Farmacia.find().sort({ name: -1 });
@@ -57,19 +66,12 @@ router.post('/farmacia/activate/:id', (req, res) => {
 
 router.post('/farmacias/delete/:id', async (req, res) => {
   try {
-    // Encontre a farmácia pelo ID
     const farmacia = await Farmacia.findById(req.params.id);
-    
-    // Verifique se a farmácia foi encontrada
     if (!farmacia) {
       req.flash('error_msg', 'Farmácia não encontrada');
       return res.redirect('/admin/farmacias');
     }
-
-    // Deleta todos os produtos associados a essa farmácia
     await ProdutoCLTN.deleteMany({ farmacia: farmacia._id });
-
-    // Deleta a própria farmácia
     await farmacia.remove();
 
     req.flash('success_msg', 'Farmácia e produtos deletados com sucesso');

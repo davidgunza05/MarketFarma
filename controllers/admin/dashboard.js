@@ -5,6 +5,7 @@ const UserCLTN = require("../../models/user/details");
 const productCLTN = require("../../models/admin/product");
 const contactCLTN = require('../../models/farmacia/contacto')
 const Farmacia = require('../../models/farmacia/farmacia')
+const Notification = require('../../models/farmacia/notification')
 moment.locale('pt-br');
 
 exports.view = async (req, res) => {
@@ -14,6 +15,8 @@ exports.view = async (req, res) => {
     const customerCount = await UserCLTN.countDocuments();
     const FarmaciaCount = await Farmacia.countDocuments();
     const productCount = await productCLTN.countDocuments();
+    
+    const Notificar = await Notification.find({isRead: false}).sort({createdAt: -1})
     
     const allProducts = await productCLTN.find({})
 
@@ -101,6 +104,7 @@ exports.view = async (req, res) => {
         contEmail,
         allProducts,
         vendaDesteMes,
+        Notificar,
         //totalRevenue,
         details: contacts,
         documentTitle: 'Painel Admin'

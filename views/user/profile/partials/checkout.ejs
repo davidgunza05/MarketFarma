@@ -86,14 +86,9 @@
   </div>
 
   <div class="col-lg-4">
-    <div class="order-summary rounded p-3 d-flex flex-column" style="border: 1px solid #dbdbdb; font-size: 0.9rem;" >
-        <div class="mb-2">
-          <input type="text" class="form-control" id="couponCode" placeholder="Código de desconto" name = "couponCode" onkeyup="checkCoupon()"/>
-        </div>
-        <span id="couponMessage" class="bg-light px-2 rounded m-2">
-        </span>
-    </div>
-    <div class="addresses rounded p-4 my-3" style="border: 1px solid #dbdbdb">
+   <input type="text" class="form-control" id="couponCode" placeholder="Código de desconto" hidden name ="couponCode" onkeyup="checkCoupon()"/>
+        
+    <div class="addresses rounded p-4" style="border: 1px solid #dbdbdb">
       <h6 class="border-bottom pb-2">Forma de Pagamento<h6>
       <div class="form-check d-flex align-items-center" style="font-size: 0.85rem;">
         <input class="ft" type="radio" name="paymentMethod" value="PayPal" id="flexRadioDefault2" checked>

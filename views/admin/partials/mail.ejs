@@ -23,6 +23,7 @@
                           <tr style="background: #e3e3e3;">
                             <th>Nome</th>
                             <th>Email</th>
+                            <th>Contacto</th>
                             <th>Data</th>
                             <th></th>
                           </tr>
@@ -33,9 +34,10 @@
                             <tr>
                               <td><%= item.name %></td>
                               <td><%= item.email %></td>
+                              <td><%= item.numero %></td>
                               <td><%=moment(item.date).format('LLL')%></td>
                               <td class="text-center">
-                                <button class="btn btn-sm btn-info "><a href="/admin/mail_managements/<%= item._id %>" class="text-white decoration-none">Ver</a></button>
+                                <a href="/admin/mail_managements/<%= item._id %>" class="btn btn-sm btn-dark">Ver</a>
                                 <button class="btn btn-sm btn-danger text-white">
                                   <a href="/admin/mail/delete_email?id=<%= item._id%>" onclick="return confirm('Pretende eliminar email de <%= item.name %> ?')" class="text-white decoration-none">deletar</a>
                                 </button>

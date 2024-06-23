@@ -78,6 +78,6 @@ app.listen(PORT, (err) => {
   if (err) {
     console.log("Erro ao iniciar servidor: " + err);
   } else {
-    console.log("Servidor rodando em https://localhost:3000");
+    console.log(`Servidor rodando em https://localhost:${PORT}`);
   }
 });

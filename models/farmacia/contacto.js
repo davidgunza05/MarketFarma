@@ -5,10 +5,18 @@ const ContactoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  email: {
+  farma_ID:{
     type: String,
     required: true
   },
+  farmacia: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Farmacia'
+  },
+  email: {
+    type: String,
+    required: true
+  }, 
   msg: {
     type: String,
     required: true
@@ -21,9 +29,6 @@ const ContactoSchema = new mongoose.Schema({
     type: Date,
     default: Date.now()
   }, 
-  image: {
-    type: String,
-  },
 });
 
 const contactoCLTN = mongoose.model('Contacto', ContactoSchema);

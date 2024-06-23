@@ -6,6 +6,9 @@ const ClienteModel = require("../models/user/details")
 const OrderModel = require("../models/user/orders")
 const CategoriaModel = require("../models/admin/category");
 const download = require('../controllers/pdfController')
+const sessionCheck = require("../middlewares/user/sessionCheck");
+const Contacto = require("../models/farmacia/contacto");
+const ContactoAdmin = require("../models/farmacia/contactoAdmin");
 const { Auth } = require('../config/auth');
 const upload = require("../utilities/imageUpload"); 
 const DesconontoModel = require("../models/admin/coupons");
@@ -22,10 +25,115 @@ const path = require('path');
 const logoPath = path.join(__dirname, '../public/img/timeless-logo.png');
 const logoData = fs.readFileSync(logoPath, { encoding: 'base64' });
 const logoDataURI = `data:image/png;base64,${logoData}`;
-
+const Notification = require('../models/farmacia/notification')
+const UserCLTN = require("../models/user/details");
 require('../config/passport')(passport);
 moment.locale('pt-br');
 
+//#ROTAS DE CONTACTOS
+router.get('/contactos',Auth, async (req, res) => {
+  try{ 
+    const contacts = await Contacto.find({farmacia: req.user._id}).sort({ _id: -1 })
+      res.render('farmacia/mails', {  
+        moment,
+        farmacia: req.user, 
+        contacts,  
+      }) 
+
+  }catch(err){
+    console.log('erro ao renderizar email: ', err)
+  }
+})
+
+router.get('/ler/contacto/:id',Auth, async (req, res) => { 
+  try { 
+    const currentMail = await Contacto.findById(req.params.id)
+    res.render("farmacia/mailDetalhe.ejs", {
+      currentMail,
+      farmacia: req.user, 
+      moment,
+    });
+  } catch (error) {
+    console.log("erro ao renderizar email: " + error);
+  }
+  })
+
+router.post('/contacto/:id', async(req, res) =>{
+  try {
+    const farmaciaId = req.params.id;
+    req.body.farmacia = farmaciaId
+    const newContacto = new Contacto(req.body);
+    await newContacto.save();
+    req.flash('success_msg', 'Mensagem enviada com com sucesso!')
+    res.redirect(`/farmacia/enviar/contactar/${farmaciaId}`);
+  } catch (error) {
+    req.flash('error_msg', 'Erro ao enviar mensagem!')
+    res.redirect(`/farmacia/enviar/contactar/${farmaciaId}`);
+  }
+})
+
+router.get('/contactos/delete', async(req, res) => {
+  try {
+    const userId = req.query.id;
+    const deleteUser = await Contacto.findByIdAndDelete(userId);
+    req.flash('success_msg', 'Email deletado com sucesso')
+    res.redirect("/farmacia/contactos");
+  } catch (error) {
+    console.log("Erro ao deletar email: " + error);
+    res.redirect("/farmacia/contactos");
+  }
+})
+
+router.get('/enviar/contactar/:id',sessionCheck, async (req, res) => {
+  try {
+    const userID = req.session.userID;
+    const currentUser = await UserCLTN.findById(userID);
+    const categories = await CategoriaModel.find({});
+    const farmaciaId = req.params.id;
+    const farmacia = await Farmacia.findById(farmaciaId);
+    const produtos = await ProdutoModel.find({ farmacia: farmaciaId });
+
+    if (!farmacia) {
+      return res.status(404).send('Farmácia não encontrada');
+    }
+
+    res.render('index/contactarFarmacia', { 
+      farmacia, 
+      produtos, 
+      details: categories,
+      currentUser,
+      session: req.session.userID,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erro no servidor');
+  }
+});
+
+router.get('/ver/contactar/admin', Auth, async (req, res) => {
+  try {
+    res.render("farmacia/contactarAdmin", {
+      farmacia: req.user, 
+    });
+  } catch (error) {
+    console.log("Erro ao renderizar página de contacto do admin: " + error);
+  } 
+})
+
+router.post('/contactar/admin',Auth, async (req, res) =>{
+  try {
+    const newContacto = new ContactoAdmin(req.body);
+    await newContacto.save();
+    req.flash('success_msg', 'Mensagem enviada com sucesso ao Admin!')
+    res.redirect("/farmacia/ver/contactar/admin");
+  } catch (error) {
+    req.flash('error_msg', 'Erro ao enviar mensagem!')
+    res.redirect("/farmacia/ver/contactar/admin");
+    console.log('Erro: ', error)
+  }
+})
+
+//#ROTAS DE GERAR RELATÓRIOS
 router
   .route("/total_fatura_gerar/pdf/vendido")
   .get(Auth, download.Total)
@@ -38,7 +146,9 @@ router
   .route("/cliente_fatura/pdf/download")
   .get(Auth, download.Cliente)
 
-router.get('/mapa/:id', async (req, res) => {
+
+//#ROTAS DO MAPA 
+router.get('/mapa/:id',Auth, async (req, res) => {
   try {
     const mapa = await Farmacia.findById(req.params.id);
     res.render('farmacia/mapa', { mapa, farmacia: req.user });
@@ -56,12 +166,11 @@ router.get('/ver/mapa/', async (req, res) => {
     res.status(500).send('Erro ao carregar farmácias: ' + err.message);
   }
 });
-
-  
+   
 //# ROTAS DE AUTENTICAÇÃO
 router.get('/', async (req, res) => {
   const categories = await CategoriaModel.find({});
-  const farmacias = await Farmacia.find({})
+  const farmacias = await Farmacia.find({isActive: true})
   res.render('index/farmacias', { 
     farmacias,
     details: categories,
@@ -70,6 +179,8 @@ router.get('/', async (req, res) => {
 
 router.get('/pefil/:id', async (req, res) => {
   try {
+    const userID = req.session.userID;
+    const currentUser = await UserCLTN.findById(userID);
     const categories = await CategoriaModel.find({});
     const farmaciaId = req.params.id;
     const farmacia = await Farmacia.findById(farmaciaId);
@@ -79,7 +190,13 @@ router.get('/pefil/:id', async (req, res) => {
       return res.status(404).send('Farmácia não encontrada');
     }
 
-    res.render('index/profile', { farmacia, produtos, details: categories,});
+    res.render('index/profile', { 
+      farmacia, 
+      produtos, 
+      details: categories,
+      currentUser,
+      session: req.session.userID,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('Erro no servidor');
@@ -120,16 +237,23 @@ router.post('/registrar', upload.fields([{ name: "thumbnail", maxCount: 1 }]), a
                 bcrypt.hash(newFarmacia.password, salt, (err, hash) => {
                   if (err) throw err;
                   newFarmacia.password = hash;
-                  newFarmacia.save()
-                    .then(farmacia => {
+                  newFarmacia.save().then(farmacia => {
                       req.flash('success_msg', 'Farmácia registrada, entre em contacto com o admin para ativar a sua conta.');
                       res.redirect('/farmacia/login');
-                    })
-                    .catch(err => {
+                    }).catch(err => {
                       req.flash('error_msg', 'Erro ao registrar a farmácia.');
                       res.redirect('/farmacia/registrar');
                       console.log(err)
-                    });
+                    })
+
+                  const nomeFarma = req.body.name  
+                  const notifique = new Notification({
+                    type: 'Nova Farmácia',
+                    message: `Tens uma nova farmácia cadastrada chamada: ${nomeFarma}`
+                  })
+
+                  notifique.save()
+                  
                 });
               });
             }
@@ -140,7 +264,7 @@ router.post('/registrar', upload.fields([{ name: "thumbnail", maxCount: 1 }]), a
     catch(err) {
       console.log('Erro ao cadastrar farmácia', err)
     }
-  })
+})
 
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', {
@@ -649,7 +773,6 @@ router.put('/dashboard', async (req, res) => {
   }
 });
 
-
 router.get('/total_vendido', Auth, async (req, res) => {
   try {
     const currentYear = new Date().getFullYear();
@@ -738,6 +861,7 @@ router.get('/total_vendido', Auth, async (req, res) => {
     res.status(500).send('Erro no servidor');
   }
 });
+
 
 // Rota para produtos mais vendidos
 router.get('/mais_vendidos', Auth, async (req, res) => {
@@ -932,7 +1056,6 @@ router.get('/clientes_mais_pedidos', Auth, async (req, res) => {
 
 
 //# ROTAS ADICIONAIS
-
 router.get('/desconto', Auth, async (req, res) => {
   try {
     const coupons = await DesconontoModel.find({farmacia: req.user._id});
@@ -947,8 +1070,9 @@ router.get('/desconto', Auth, async (req, res) => {
   }
 })
 
-router.post('/desconto', async (req, res) =>{
+router.post('/post/desconto/:id', async (req, res) =>{
   try {  
+    const farmaciaId = req.params.id;
     const newCoupon = new DesconontoModel({
       name: req.body.name,
       code: req.body.code,
