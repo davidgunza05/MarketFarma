@@ -64,7 +64,7 @@ $.ajax({
     new Chart(ctz, {
       type: "doughnut",
       data: {
-        labels: ["Processando", "Concluído"],
+        labels: ["Processando", "Concluído","Cancelado"],
         datasets: [
           {
             label: "Estado de compra",

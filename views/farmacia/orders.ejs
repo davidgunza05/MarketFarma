@@ -60,6 +60,11 @@
                                   <button class="btn btn-sm btn-dark w-100" onclick="return confirm('Pretende concluir a entrega ?'), deliverOrder('<%=item._id%>','<%=i%>')" ->
                                     <span>Entregar <i class="fa fa-truck text-warning"></i></span>
                                   </button>
+                                  <% if (item.status !== "Cancelado") { %>
+                                    <form action="/farmacia/cancel/<%= item._id %>" method="POST">
+                                      <button type="submit" class="btn btn-danger btn-sm mt-2 ">Cancelar</button>
+                                    </form>
+                                  <% } %>
                                   <%}else{%>
                                   <span>
                                   <span class="badge btn-success"><i class="fa fa-check text-success"></i> Concluído</span> <%} %> <br />

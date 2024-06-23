@@ -1123,5 +1123,41 @@ router.post('/editar/:id', Auth, upload.fields([{ name: "thumbnail", maxCount: 1
   }
 })
 
+router.post('/cancel/:orderId', Auth, async (req, res) => {
+  const { orderId } = req.params;
+ 
+  try {
+    const order = await OrderModel.findById(orderId).populate('summary.product');
+    if (!order) {
+      return res.status(404).json({ message: "Pedido não encontrado" });
+    }
 
+    if (order.farmacia.toString() !== req.user._id.toString()) {
+      req.flash('error_msg', 'Você não tem permissão para cancelar este pedido')
+      res.redirect(`/farmacia/farmacias/${orderId}/orders`);
+    }
+
+    order.status = "Cancelado";
+
+    for (const item of order.summary) {
+      const product = item.product;
+
+      // Atualiza a quantidade em estoque
+      product.stock += item.quantity;
+      // Atualiza o número de unidades vendidas
+      product.sold -= item.quantity;
+
+      await product.save();
+    }
+
+    await order.save();
+     
+    req.flash('success_msg', 'Pedido cancelado com sucesso')
+    res.redirect(`/farmacia/dashboard`);
+  } catch (error) {
+    console.error("Erro ao cancelar", error); 
+    req.flash('error_msg', 'Erro ao cancelar o pedido')
+    res.redirect(`/farmacia/dashboard`);
+  }
+});
 module.exports = router;   
