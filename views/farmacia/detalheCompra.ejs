@@ -135,13 +135,7 @@
                       <a href="/farmacia/orders" style="font-size: 0.7rem;" class="col-3 btn btn-dark d-flex align-items-center justify-content-center px-2 mb-3 text-white"
                       ><i class="fa fa-arrow-left mx-1"></i> Voltar a todos pedidos</a
                     > 
-                    <%if(currentOrder.delivered == false){%>
-                    <%if(currentOrder.status !== 'Cancelled'){%> 
-                    <form action="/admin/cancelar/order/<%=currentOrder._id%>" method="post">
-                      <button type="submit" class="btn btn-danger d-flex align-items-center justify-content-center px-2 mb-3 text-white" onclick="return confirm('Pretende Cancelar este pedido ?')">Cancelar pedido</button> 
-                    </form>
-                    <% }%> 
-                    <%}%>
+
                     <form action="/farmacia/fatura/pdf/<%=currentOrder._id%>" method="get">
                       <button style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2.5px;" class="btn btn-dark d-flex align-items-center justify-content-center px-2 mb-3 text-white"
                         type="submit"><i class="fa fa-download"></i> Baixar fatura </button> 
